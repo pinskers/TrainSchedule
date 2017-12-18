@@ -38,15 +38,18 @@ $(document).ready(function() {
       frequency: frequency,
     });
   });
-
+  // The data sent to firebase should be retreived and added to the train schedule table.
   database.ref().on("child_added", function(childSnapshot) {
     console.log(childSnapshot.val().name);
     console.log(childSnapshot.val().destination);
     console.log(childSnapshot.val().fTrainTime);
     console.log(childSnapshot.val().frequency);
+
+    $("#train-entry").append("<td class='name'> " + childSnapshot.val().name +
+    " </td><td class='destination'> " + childSnapshot.val().destination +
+    " </td><td class='frequency'> " + childSnapshot.val().frequency + " </td>");
   });  
 });
-// The data sent to firebase should be retreived and added to the train schedule table.
 
 // Next arrival is based on the first train time and frequency of the train.
 
