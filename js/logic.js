@@ -1,11 +1,8 @@
 // Initialize Variables
 var name = "";
 var destination = "";
-var fTrainTime = "";
-var frequency = "";
-var nextArrival = "";
-var minutesAway = "";
-var currentTime = "";
+var fTrainTime = "";     // Current Time
+var frequency = "";     //  Frequency
 
 
 // Initialize Firebase
@@ -38,19 +35,67 @@ $(document).ready(function() {
       frequency: frequency,
     });
   });
-  // The data sent to firebase should be retreived and added to the train schedule table.
+  // The data sent to firebase should be retreived and added to the train schedule table and converted using moment.js.
   database.ref().on("child_added", function(childSnapshot) {
+    // First Time (pushed back 1 year to make sure it comes before current time)
+    var fTrainTimeConverted = moment(fTrainTime, "hh:mm").subtract(1, "years");
+    // Difference between the times
+    var timeDifference = moment().diff(moment.unix(fTrainTimeConverted), "minutes");
+    // Time apart (remainder)
+    var timeRemainder = moment().diff(moment.unix(fTrainTime),"minutes") % frequency;
+    var minutesAway = frequency - timeRemainder;
+    var nextArrival = moment().add(minutesAway, "m").format("hh:mm A");
+    
     console.log(childSnapshot.val().name);
     console.log(childSnapshot.val().destination);
     console.log(childSnapshot.val().fTrainTime);
     console.log(childSnapshot.val().frequency);
+    console.log(fTrainTimeConverted);
+    console.log(minutesAway);
+    console.log(nextArrival);
 
-    $("#train-entry").append("<td class='name'> " + childSnapshot.val().name +
+    $("#train-entry").append(" <tr id='train-row'> "+
+    " <td class='name'> " + childSnapshot.val().name +
     " </td><td class='destination'> " + childSnapshot.val().destination +
-    " </td><td class='frequency'> " + childSnapshot.val().frequency + " </td>");
+    " </td><td class='frequency'> " + childSnapshot.val().frequency + " </td>" + " </tr>");
   });  
 });
 
 // Next arrival is based on the first train time and frequency of the train.
 
-// Minutes away is based off of next arrival and current time.
+// Minutes away is based off of next arrival and current time. ???
+
+// Reference math UGH
+
+    // Assume the following situations.
+
+    // (TEST 1)
+    // First Train of the Day is 3:00 AM
+    // Assume Train comes every 3 minutes.
+    // Assume the current time is 3:16 AM....
+    // What time would the next train be...? (Use your brain first)
+    // It would be 3:18 -- 2 minutes away
+
+    // (TEST 2)
+    // First Train of the Day is 3:00 AM
+    // Assume Train comes every 7 minutes.
+    // Assume the current time is 3:16 AM....
+    // What time would the next train be...? (Use your brain first)
+    // It would be 3:21 -- 5 minutes away
+
+
+    // ==========================================================
+
+    // Solved Mathematically
+    // Test case 1:
+    // 16 - 00 = 16
+    // 16 % 3 = 1 (Modulus is the remainder)
+    // 3 - 1 = 2 minutes away
+    // 2 + 3:16 = 3:18
+
+    // Solved Mathematically
+    // Test case 2:
+    // 16 - 00 = 16
+    // 16 % 7 = 2 (Modulus is the remainder)
+    // 7 - 2 = 5 minutes away
+    // 5 + 3:16 = 3:21
