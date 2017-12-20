@@ -42,26 +42,28 @@ $(document).ready(function() {
     // Difference between the times
     var timeDifference = moment().diff(moment.unix(fTrainTimeConverted), "minutes");
     // Time apart (remainder)
-    var timeRemainder = moment().diff(moment.unix(fTrainTime),"minutes") % frequency;
+    var timeRemainder =  timeDifference % frequency;
+    // Minute Until Train
     var minutesAway = frequency - timeRemainder;
-    var nextArrival = moment().add(minutesAway, "m").format("hh:mm A");
+    // Next Train
+    var nextArrival = moment().add(minutesAway, "m").format("hh:mm");
     
     console.log(childSnapshot.val().name);
     console.log(childSnapshot.val().destination);
     console.log(childSnapshot.val().fTrainTime);
     console.log(childSnapshot.val().frequency);
-    console.log(fTrainTimeConverted);
-    console.log(minutesAway);
-    console.log(nextArrival);
+    console.log("CONVERTED FIRST TRAIN TIME: " + fTrainTimeConverted);
+    console.log("MINUTES AWAY: " + minutesAway);
+    console.log("NEXT TRAIN: " + nextArrival);
 
     $("#train-entry").append(" <tr id='train-row'> "+
     " <td class='name'> " + childSnapshot.val().name +
     " </td><td class='destination'> " + childSnapshot.val().destination +
-    " </td><td class='frequency'> " + childSnapshot.val().frequency + " </td>" + " </tr>");
+    " </td><td class='frequency'> " + childSnapshot.val().frequency + 
+    " </td><td class='next-arrival'> " + nextArrival + 
+    " </td><td class='minutes-away'> " + minutesAway + " </td></tr>");
   });  
 });
-
-// Next arrival is based on the first train time and frequency of the train.
 
 // Minutes away is based off of next arrival and current time. ???
 
