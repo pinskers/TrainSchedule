@@ -3,6 +3,11 @@ var name = "";
 var destination = "";
 var fTrainTime = "";     // Current Time
 var frequency = "";     //  Frequency
+var fTrainTimeConverted = ""; // First Time
+var timeDifference = ""; // Difference between the times
+var timeRemainder = ""; // Time Apart (Remainder)
+var minutesAway = ""; // Minutes Until Train
+var nextArrival = ""; // Next Train
 
 
 // Initialize Firebase
@@ -38,24 +43,17 @@ $(document).ready(function() {
   // The data sent to firebase should be retreived and added to the train schedule table and converted using moment.js.
   database.ref().on("child_added", function(childSnapshot) {
     // First Time (pushed back 1 year to make sure it comes before current time)
-    var fTrainTimeConverted = moment(fTrainTime, "hh:mm").subtract(1, "years");
+    fTrainTimeConverted = moment(fTrainTime, "hh:mm").subtract(1, "years");
     // Difference between the times
-    var timeDifference = moment().diff(moment.unix(fTrainTimeConverted), "minutes");
+    timeDifference = moment().diff(moment.unix(fTrainTimeConverted), "minutes");
     // Time apart (remainder)
-    var timeRemainder =  timeDifference % frequency;
+    timeRemainder =  timeDifference % frequency;
     // Minute Until Train
-    var minutesAway = frequency - timeRemainder;
+    minutesAway = frequency - timeRemainder;
     // Next Train
-    var nextArrival = moment().add(minutesAway, "m").format("hh:mm");
-    
-    console.log(childSnapshot.val().name);
-    console.log(childSnapshot.val().destination);
-    console.log(childSnapshot.val().fTrainTime);
-    console.log(childSnapshot.val().frequency);
-    console.log("CONVERTED FIRST TRAIN TIME: " + fTrainTimeConverted);
-    console.log("MINUTES AWAY: " + minutesAway);
-    console.log("NEXT TRAIN: " + nextArrival);
+    nextArrival = moment().add(minutesAway, "m").format("hh:mm");
 
+    // Push to table
     $("#train-entry").append(" <tr id='train-row'> "+
     " <td class='name'> " + childSnapshot.val().name +
     " </td><td class='destination'> " + childSnapshot.val().destination +
